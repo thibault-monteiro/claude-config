@@ -1,0 +1,55 @@
+# ============================================================
+# ~/.claude/.gitignore — synchronisation entre postes
+# ============================================================
+# Stratégie: tout ignorer par défaut, puis whitelister explicitement
+# ce qui est portable (config + mémoires).
+#
+# NE JAMAIS tracker:
+#  - .credentials.json (tokens API)
+#  - history.jsonl / telemetry (vie privée + propre au poste)
+#  - cache/ / shell-snapshots/ / session-env/ (state runtime)
+#  - projects/*/<sessionId>.jsonl (transcripts)
+# ============================================================
+
+# --- 1. Tout ignorer par défaut ---
+/*
+
+# --- 2. Whitelist racine ---
+!/.gitignore
+!/CLAUDE.md
+!/RTK.md
+!/settings.json
+
+# --- 3. Whitelist projects/<projet>/memory/ uniquement ---
+!/projects/
+projects/*
+!projects/*/
+projects/*/*
+!projects/*/memory/
+projects/*/memory/*
+!projects/*/memory/*.md
+
+# --- 4. Garde-fous explicites (ceinture + bretelles) ---
+# Au cas où l'arbo change un jour et que le pattern racine se brise
+.credentials.json
+.last-cleanup
+history.jsonl
+mcp-needs-auth-cache.json
+policy-limits.json
+remote-settings.json
+backups/
+cache/
+debug/
+plugins/
+session-env/
+sessions/
+shell-snapshots/
+tasks/
+telemetry/
+todos/
+
+# Transcripts et state par session (sous projects/)
+projects/*/*.jsonl
+projects/*/[0-9a-f]*-*/
+projects/*/subagents/
+projects/*/tool-results/
