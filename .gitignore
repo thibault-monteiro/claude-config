@@ -19,6 +19,7 @@
 !/CLAUDE.md
 !/RTK.md
 !/settings.json
+!/sync.sh
 
 # --- 3. Whitelist projects/<projet>/memory/ uniquement ---
 !/projects/
