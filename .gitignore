@@ -17,6 +17,7 @@
 # --- 2. Whitelist racine ---
 !/.gitignore
 !/CLAUDE.md
+!/README.md
 !/RTK.md
 !/settings.json
 !/sync.sh
