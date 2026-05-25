@@ -4,9 +4,10 @@ Mes dotfiles pour Claude Code, synchronisés entre 2 postes.
 
 ## Contenu tracké
 
-- **`CLAUDE.md`** — instructions globales (chargées sur tous les projets) : règles
-  d'investigation (pas de truncate `--help`), multi-agent review systématique sur
-  features non-triviales.
+- **`CLAUDE.md`** — instructions globales (chargées sur tous les projets) :
+  4 principes de mindset (think-before-coding, simplicity-first, surgical-changes,
+  goal-driven-execution), règle no-truncate `--help`, multi-agent review
+  systématique sur features non-triviales.
 - **`RTK.md`** — règles agent pour maximiser le hit-rate du hook RTK (Rust Token
   Killer). 5 règles + checklists préalables, durcies après audit du 2026-05-23.
 - **`settings.json`** — permissions allow/deny + hook RTK `PreToolUse` sur matcher
