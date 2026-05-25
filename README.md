@@ -25,9 +25,10 @@ plus juste, et capitalise sur les sessions passées.
 L'idée n'est pas de produire un assistant générique, c'est de poser des
 **garde-fous battle-tested** au-dessus de Claude :
 
-- un mindset clair, hérité d'un CLAUDE.md partagé par un fondateur
-  d'Anthropic — *think before coding, simplicity first, surgical
-  changes, goal-driven execution* ;
+- un mindset clair, inspiré du [CLAUDE.md d'Andrej
+  Karpathy](https://github.com/multica-ai/andrej-karpathy-skills/blob/main/CLAUDE.md)
+  — *think before coding, simplicity first, surgical changes,
+  goal-driven execution* ;
 - des règles d'investigation issues de vrais ratés (j'ai déjà ouvert un
   faux bug parce que j'avais `head -40` un `--help`) ;
 - du multi-agent systématique sur les features non-triviales (builder +
@@ -63,8 +64,8 @@ Trois piliers, chargés automatiquement par Claude Code sur tous les projets :
 
 ### Le mindset (`CLAUDE.md`)
 
-Quatre principes condensés, inspirés du CLAUDE.md d'un fondateur
-d'Anthropic — biaisés vers la prudence et la simplicité :
+Quatre principes condensés, inspirés du [CLAUDE.md d'Andrej Karpathy](https://github.com/multica-ai/andrej-karpathy-skills/blob/main/CLAUDE.md)
+— biaisés vers la prudence et la simplicité :
 
 | # | Principe | En une ligne |
 |---|---|---|
@@ -175,7 +176,7 @@ Idempotent — relancer ne fait rien si tout est à jour.
 | `cache/`, `shell-snapshots/`, `session-env/` | Runtime éphémère |
 | `projects/*/[uuid].jsonl` | Transcripts volumineux + propres au poste |
 | `todos/`, `tasks/` | State de session |
-| `plugins/` | Réinstallables (passer par `cp -r` à la première sync si voulu) |
+| `plugins/` | Réinstallables — restaurables depuis le backup au setup, pas synchro |
 
 <a id="adapter-à-ton-workflow"></a>
 
@@ -194,10 +195,10 @@ librement et tord-le à ton workflow :
 - **Tu veux des principes plus stricts ou plus permissifs ?** Édite
   `CLAUDE.md`. Claude le lit au chargement, pas de redémarrage.
 
-Source d'inspiration pour les 4 principes : un CLAUDE.md partagé
-publiquement par un fondateur d'Anthropic. Le reste vient de mes propres
-audits (RTK), incidents (no-truncate `--help`) et préférences workflow
-(multi-agent review).
+Source d'inspiration pour les 4 principes : le [CLAUDE.md d'Andrej
+Karpathy](https://github.com/multica-ai/andrej-karpathy-skills/blob/main/CLAUDE.md).
+Le reste vient de mes propres audits (RTK), incidents (no-truncate
+`--help`) et préférences workflow (multi-agent review).
 
 ---
 

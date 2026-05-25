@@ -62,7 +62,7 @@ rather than after mistakes.
 When inspecting a tool's capabilities to decide what it supports, READ
 THE FULL OUTPUT. Truncating with `head -N` or `tail -N` leads to false
 "this doesn't exist" claims when the missing item happens to fall in
-the omitted zone. This has bitten us at least once already (filed an
+the omitted zone. This has bitten me at least once already (I filed an
 issue against rtk claiming `npm` wasn't supported, then discovered
 `rtk npm` was just below my truncation cut-off).
 
