@@ -1,4 +1,4 @@
-# claude-conf 🧠
+# claude-config 🧠
 
 <div align="center">
 
@@ -60,7 +60,7 @@ Trois piliers, chargés automatiquement par Claude Code sur tous les projets :
 |---|---|---|
 | **Mindset** | `CLAUDE.md` | 4 principes haut niveau + investigation + multi-agent review |
 | **Tokens** | `RTK.md` | 5 règles agent pour maximiser le hit-rate du hook RTK |
-| **Mémoire** | `projects/*/memory/*.md` | Apprentissages auto-générés par projet |
+| **Mémoire** | `projects/*/memory/*.md` | Apprentissages auto-générés par projet (local uniquement, pas sync) |
 
 ### Le mindset (`CLAUDE.md`)
 
@@ -104,8 +104,10 @@ Claude écrit des fichiers `feedback_*.md`, `reference_*.md`,
 `MEMORY.md`. Au prochain démarrage sur le même projet, ces faits sont
 rechargés — la collaboration ne repart pas de zéro.
 
-Seuls les `.md` de mémoire sont commités ; les transcripts, state et
-runtime restent locaux (cf. [Ce qui n'est PAS sync](#ce-qui-nest-pas-sync)).
+⚠️ **Les mémoires restent locales** — elles contiennent souvent des
+infos internes (noms d'équipe, URLs on-premise, détails codebase) qui
+n'ont rien à faire sur un repo public. Seules les configs génériques
+(`CLAUDE.md`, `RTK.md`, `settings.json`) sont synchronisées.
 
 <a id="setup-nouveau-poste"></a>
 
@@ -116,7 +118,7 @@ runtime restent locaux (cf. [Ce qui n'est PAS sync](#ce-qui-nest-pas-sync)).
 mv "$HOME/.claude" "$HOME/.claude.backup"
 
 # 2. Clone
-git clone https://github.com/thibault-monteiro/claude-conf.git "$HOME/.claude"
+git clone https://github.com/thibault-monteiro/claude-config.git "$HOME/.claude"
 
 # 3. Restaure les credentials (jamais commités — propres à chaque poste)
 cp "$HOME/.claude.backup/.credentials.json" "$HOME/.claude/"
@@ -155,14 +157,9 @@ Idempotent — relancer ne fait rien si tout est à jour.
 ├── README.md           # ce fichier
 ├── sync.sh             # script de sync pull/commit/push
 ├── .credentials.json   # ⛔ jamais commité (par poste)
-└── projects/
+└── projects/             # ⛔ local uniquement (infos internes)
     └── <projet>/
-        └── memory/
-            ├── MEMORY.md           # index
-            ├── feedback_*.md       # corrections + validations utilisateur
-            ├── reference_*.md      # pointeurs externes (repos, dashboards)
-            ├── project_*.md        # contexte projet vivant
-            └── user_*.md           # profil utilisateur
+        └── memory/*.md   # auto-généré par Claude, jamais sync
 ```
 
 <a id="ce-qui-nest-pas-sync"></a>
@@ -174,6 +171,7 @@ Idempotent — relancer ne fait rien si tout est à jour.
 | `.credentials.json` | Tokens API — propres à chaque poste |
 | `history.jsonl`, `telemetry/`, `sessions/` | Vie privée + state runtime |
 | `cache/`, `shell-snapshots/`, `session-env/` | Runtime éphémère |
+| `projects/` (tout le dossier) | Mémoires projet — contiennent des infos internes (noms, URLs, codebase) |
 | `projects/*/[uuid].jsonl` | Transcripts volumineux + propres au poste |
 | `todos/`, `tasks/` | State de session |
 | `plugins/` | Réinstallables — restaurables depuis le backup au setup, pas synchro |
