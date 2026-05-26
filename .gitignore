@@ -16,15 +16,11 @@
 !/settings.json
 !/sync.sh
 
-# --- 3. Whitelist projects/<projet>/memory/*.md uniquement ---
-# (le reste de projects/<projet>/ — transcripts, sous-agents, tool-results — reste ignoré)
-!/projects/
-projects/*
-!projects/*/
-projects/*/*
-!projects/*/memory/
-projects/*/memory/*
-!projects/*/memory/*.md
+# --- 3. Projects (mémoires per-projet) ---
+# Les mémoires contiennent des infos internes (noms d'équipe, URLs on-premise,
+# détails codebase). NE PAS les synchroniser sur un repo public.
+# Utiliser un canal privé si besoin de sync entre postes.
+# projects/  ← couvert par le /* de la section 1
 
 # --- 4. Garde-fou paranoïa sur les secrets ---
 # (redondant avec section 1 aujourd'hui, mais survit à un éventuel
