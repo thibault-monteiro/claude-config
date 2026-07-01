@@ -31,10 +31,41 @@ pg() { git --git-dir="$GD" --work-tree="$WT" "$@"; }
 # Ajoute UNIQUEMENT les mémoires et les skills (jamais les transcripts *.jsonl).
 # -f : la .gitignore publique (/*) couvre tout le work-tree ; on force donc
 # l'ajout des seuls chemins explicitement listés ici (aucun risque d'élargir).
+# Chemins ajoutés conditionnellement : un poste vierge n'a ni skills/ ni mémoires,
+# et `git add` d'un pathspec inexistant renvoie rc=128 → tuerait set -e.
 stage_private() {
-  local dirs=(skills)
+  local dirs=()
+  [[ -d skills ]] && dirs+=(skills)
   for d in projects/*/memory; do [[ -d "$d" ]] && dirs+=("$d"); done
+  if [[ ${#dirs[@]} -eq 0 ]]; then
+    echo "→ rien à indexer (ni skills/ ni mémoires sur ce poste)"
+    return 0
+  fi
   pg add -f -A -- "${dirs[@]}"
+}
+
+# Récupère origin/private SANS écraser des commits locaux non poussés.
+# (checkout -B brut ferait perdre des commits locaux en cas de divergence.)
+safe_pull_private() {
+  if ! pg rev-parse --verify -q origin/private >/dev/null; then
+    echo "→ pas de branche 'private' sur claude-conf — rien à récupérer."
+    echo "  Lance './sync-private.sh push' depuis le poste qui a les mémoires."
+    return 0
+  fi
+  if pg show-ref --verify -q refs/heads/private; then
+    local ahead
+    ahead=$(pg rev-list --count origin/private..private 2>/dev/null || echo 0)
+    if [[ "$ahead" -gt 0 ]]; then
+      echo "⛔ $ahead commit(s) local(aux) non poussé(s) sur 'private'."
+      echo "  Lance './sync-private.sh push' d'abord (sinon ils seraient perdus)."
+      exit 1
+    fi
+    pg checkout -q private 2>/dev/null || true
+    pg merge --ff-only origin/private
+  else
+    pg checkout -B private origin/private
+  fi
+  echo "→ mémoires + skills à jour depuis claude-conf"
 }
 
 case "${1:-status}" in
@@ -50,13 +81,7 @@ case "${1:-status}" in
     fi
     echo "→ fetch claude-conf"
     pg fetch origin -q || true
-    if pg rev-parse --verify -q origin/private >/dev/null; then
-      pg checkout -B private origin/private
-      echo "→ mémoires + skills récupérés depuis claude-conf (branche 'private')"
-    else
-      echo "→ pas encore de branche 'private' sur claude-conf."
-      echo "  Lance d'abord un './sync-private.sh push' depuis le poste qui a les mémoires."
-    fi
+    safe_pull_private
     ;;
 
   push)
@@ -74,13 +99,19 @@ case "${1:-status}" in
 
   pull)
     pg fetch origin -q
-    pg checkout -B private origin/private
-    echo "→ pull OK (mémoires + skills à jour)"
+    safe_pull_private
     ;;
 
   status)
     if [[ -d "$GD" ]]; then
       pg status -sb
+      # showUntrackedFiles=no masque les nouvelles mémoires : on les liste explicitement.
+      dirs=(); [[ -d skills ]] && dirs+=(skills)
+      for d in projects/*/memory; do [[ -d "$d" ]] && dirs+=("$d"); done
+      if [[ ${#dirs[@]} -gt 0 ]]; then
+        new=$(pg -c status.showUntrackedFiles=normal status -s -- "${dirs[@]}" | grep -c '^??' || true)
+        [[ "$new" -gt 0 ]] && echo "→ $new fichier(s) privé(s) non encore suivi(s) — un 'push' les prendra"
+      fi
     else
       echo "pas encore initialisé — lance : ./sync-private.sh setup"
     fi
