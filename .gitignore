@@ -15,6 +15,7 @@
 !/RTK.md
 !/settings.json
 !/sync.sh
+!/sync-private.sh
 
 # --- 3. Projects (mémoires per-projet) ---
 # Les mémoires contiennent des infos internes (noms d'équipe, URLs on-premise,

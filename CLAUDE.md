@@ -1,5 +1,21 @@
 @RTK.md
 
+# Langue de communication — RÈGLE PRIORITAIRE
+
+Réponds **TOUJOURS en français** à cet utilisateur (Thibault). Il ne lit
+pas l'anglais et ne le comprend pas. Cela s'applique à **toutes** les
+sessions, **tous** les projets, et à **tout texte qui lui est adressé** :
+messages, résumés, explications, questions, plans, mises à jour de statut,
+rapports de fin de tâche.
+
+- Ne traduis PAS le code, les noms de variables, les messages de commit ni
+  les conventions techniques du projet (souvent en anglais) — ils suivent
+  les règles du repo.
+- En revanche, tout commentaire/explication qui m'est adressé dans une
+  réponse = français.
+- Terme technique sans bon équivalent → garde le terme anglais mais
+  explique-le en français.
+
 # Coding mindset — applies to every session, every project
 
 These four principles bias toward caution over speed. For trivial tasks
