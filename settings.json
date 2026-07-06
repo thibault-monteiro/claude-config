@@ -1,4 +1,10 @@
 {
+  "env": {
+    "GIT_AUTHOR_NAME": "Claude Bot",
+    "GIT_AUTHOR_EMAIL": "noreply@anthropic.com",
+    "GIT_COMMITTER_NAME": "Claude Bot",
+    "GIT_COMMITTER_EMAIL": "noreply@anthropic.com"
+  },
   "permissions": {
     "allow": [
       "Bash(git:*)",
@@ -69,12 +75,6 @@
       "Bash(chown:*)"
     ]
   },
-  "env": {
-    "GIT_AUTHOR_NAME": "Claude Bot",
-    "GIT_AUTHOR_EMAIL": "noreply@anthropic.com",
-    "GIT_COMMITTER_NAME": "Claude Bot",
-    "GIT_COMMITTER_EMAIL": "noreply@anthropic.com"
-  },
   "hooks": {
     "PreToolUse": [
       {
@@ -89,7 +89,8 @@
     ]
   },
   "disableRemoteControl": false,
-  "theme": "dark",
   "skipDangerousModePermissionPrompt": true,
-  "skipWorkflowUsageWarning": true
+  "skipWorkflowUsageWarning": true,
+  "theme": "dark",
+  "agentPushNotifEnabled": true
 }
