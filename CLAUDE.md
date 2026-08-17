@@ -18,6 +18,18 @@ arbitraire → ça produit de faux « ça n'existe pas » quand l'élément cher
 dans la zone coupée. Exceptions : sorties énormes (build logs) scannées pour un
 signal précis avec `grep`/`tail` *intentionnel*, ou « les N premiers » demandés.
 
+# Mails : j'écris le HTML, je ne touche JAMAIS à Gmail
+
+« Réponds à ce mail » = **produis le corps du message en HTML**, que Thibault relit
+puis copie-colle lui-même. Interdit de prendre la main sur sa boîte : pas de
+brouillon créé, pas d'envoi, pas de libellé, aucune écriture via les outils Gmail
+(MCP ou navigateur). Lire le fil pour le contexte : OK.
+
+- HTML simple compatible Gmail (`p`, `strong`, `ul`, `a`, styles inline, rien
+  d'externe), écrit dans un fichier du scratchpad puis livré en rendu
+  (`SendUserFile`, `display: "render"`) pour qu'il copie depuis le visuel.
+- Pas de bloc signature : Gmail ajoute le sien.
+
 # Discipline d'ingénierie — toute tâche de code non triviale
 
 Dès qu'on implémente / ajoute une feature / refactor / corrige un bug (au-delà d'un
