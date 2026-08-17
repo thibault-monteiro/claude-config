@@ -18,6 +18,32 @@ arbitraire → ça produit de faux « ça n'existe pas » quand l'élément cher
 dans la zone coupée. Exceptions : sorties énormes (build logs) scannées pour un
 signal précis avec `grep`/`tail` *intentionnel*, ou « les N premiers » demandés.
 
+# Hygiène de contexte : ce qui y entre est relu à CHAQUE tour
+
+Une sortie de commande n'est pas payée une fois : elle reste dans le contexte et
+est relue à chacun des tours suivants. Une sortie de 5k tokens produite au tour 50
+d'une session de 300 tours est relue 250 fois. Sur une session longue, ce sont les
+sorties recopiées en entier, pas le raisonnement, qui pèsent le plus lourd.
+
+Trois réflexes, dans tous les projets :
+
+- **Commande verbeuse** (build, test, install, `git log` large, dump JSON, scrape
+  HTML) → rediriger vers un fichier et ne lire que ce qui décide :
+  `… > build.log 2>&1; tail -30 build.log`, ou un `grep` des erreurs. Le fichier
+  reste sous la main si le détail devient nécessaire.
+- **`Read` ciblé** → `offset` / `limit` sur un gros fichier, plutôt que le lire en
+  entier « pour voir ».
+- **Déléguer l'exploration** (« où est défini X », balayage de plusieurs fichiers,
+  lecture d'un gros diff) à un sous-agent : son contexte meurt avec lui, je ne
+  remonte que la conclusion.
+
+🚫 Ce n'est PAS une invitation à moins vérifier, ni à écourter un travail long et
+fouillé quand Thibault en demande un : mêmes commandes, mêmes tests, mêmes
+vérifications. On en lit le verdict au lieu d'en recopier l'intégralité.
+✅ Compatible avec la règle ci-dessus : pour **décider** si un outil supporte X, on
+lit TOUT le `--help` ; ici il s'agit d'un log de 2000 lignes qu'on scanne pour un
+signal précis, exception que cette règle prévoit déjà.
+
 # Mails : j'écris le HTML, je ne touche JAMAIS à Gmail
 
 « Réponds à ce mail » = **produis le corps du message en HTML**, que Thibault relit
