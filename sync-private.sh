@@ -2,8 +2,10 @@
 # ~/.claude/sync-private.sh — synchro des données PRIVÉES entre postes
 #
 # Ce que sync.sh (public → claude-config) ne peut PAS porter, car sensible :
-#   - mémoires projet : projects/*/memory/**   (contiennent des secrets, ex. clé Kinsta)
+#   - mémoires projet  : projects/*/memory/**  (contiennent des secrets, ex. clé Kinsta)
 #   - skills custom    : skills/**             (référencent de l'infra interne)
+#   - tâches planifiées : scheduled-tasks/**    (prompts citant campagnes, chemins, ids)
+#   - restauration      : restauration/**       (inventaire du poste : où vit quoi)
 #
 # Dépôt PRIVÉ DÉDIÉ, isolé par construction :
 #   - git-dir séparé  : ~/.claude/.private.git   (ne collisionne pas avec le .git public)
@@ -36,9 +38,11 @@ pg() { git --git-dir="$GD" --work-tree="$WT" "$@"; }
 stage_private() {
   local dirs=()
   [[ -d skills ]] && dirs+=(skills)
+  [[ -d scheduled-tasks ]] && dirs+=(scheduled-tasks)
+  [[ -d restauration ]] && dirs+=(restauration)
   for d in projects/*/memory; do [[ -d "$d" ]] && dirs+=("$d"); done
   if [[ ${#dirs[@]} -eq 0 ]]; then
-    echo "→ rien à indexer (ni skills/ ni mémoires sur ce poste)"
+    echo "→ rien à indexer (aucun contenu privé sur ce poste)"
     return 0
   fi
   pg add -f -A -- "${dirs[@]}"
@@ -107,6 +111,8 @@ case "${1:-status}" in
       pg status -sb
       # showUntrackedFiles=no masque les nouvelles mémoires : on les liste explicitement.
       dirs=(); [[ -d skills ]] && dirs+=(skills)
+      [[ -d scheduled-tasks ]] && dirs+=(scheduled-tasks)
+      [[ -d restauration ]] && dirs+=(restauration)
       for d in projects/*/memory; do [[ -d "$d" ]] && dirs+=("$d"); done
       if [[ ${#dirs[@]} -gt 0 ]]; then
         new=$(pg -c status.showUntrackedFiles=normal status -s -- "${dirs[@]}" | grep -c '^??' || true)
