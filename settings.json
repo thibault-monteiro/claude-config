@@ -47,6 +47,7 @@
       "Bash(env:*)",
       "Bash(export:*)",
       "Bash(printenv:*)",
+      "Bash(schtasks:*)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebFetch(domain:api.github.com)",
@@ -89,8 +90,23 @@
     ]
   },
   "disableRemoteControl": false,
+  "statusLine": {
+    "type": "command",
+    "command": "\"powershell\" \"-NoProfile\" \"-ExecutionPolicy\" \"Bypass\" \"-File\" \"C:/Users/WIPE/.claude/hooks/caveman-statusline.ps1\""
+  },
+  "extraKnownMarketplaces": {
+    "caveman": {
+      "source": {
+        "source": "github",
+        "repo": "JuliusBrussee/caveman"
+      }
+    }
+  },
   "skipDangerousModePermissionPrompt": true,
   "skipWorkflowUsageWarning": true,
   "theme": "dark",
-  "agentPushNotifEnabled": true
+  "agentPushNotifEnabled": true,
+  "enabledPlugins": {
+    "caveman@caveman": true
+  }
 }

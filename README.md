@@ -8,6 +8,7 @@ Configuration personnelle de Claude Code — dotfiles, mindset, mémoires, sync 
 
 ![Claude Code](https://img.shields.io/badge/Claude_Code-Config-8A5CF6?style=for-the-badge&logo=anthropic&logoColor=white)
 ![RTK](https://img.shields.io/badge/RTK-token--optim-FC6D26?style=for-the-badge)
+![Caveman](https://img.shields.io/badge/Caveman-output--optim-A0522D?style=for-the-badge)
 ![Sync](https://img.shields.io/badge/Sync-2_postes-22C55E?style=for-the-badge&logo=git&logoColor=white)
 
 </div>
@@ -35,6 +36,8 @@ L'idée n'est pas de produire un assistant générique, c'est de poser des
   reviewer indépendant) ;
 - un proxy CLI (`rtk`) qui économise 60-90% de tokens sur les opérations
   dev courantes ;
+- un plugin (`caveman`) branché sur l'autre bout de la chaîne : `rtk`
+  allège ce que Claude lit, `caveman` allège ce qu'il écrit ;
 - une mémoire per-project qui s'enrichit silencieusement à chaque
   session.
 
@@ -54,12 +57,13 @@ L'idée n'est pas de produire un assistant générique, c'est de poser des
 
 ## 🧠 Ce qu'il y a dedans
 
-Trois piliers, chargés automatiquement par Claude Code sur tous les projets :
+Quatre piliers, chargés automatiquement par Claude Code sur tous les projets :
 
 | Pilier | Fichier | Rôle |
 |---|---|---|
 | **Mindset** | `CLAUDE.md` | 4 principes haut niveau + investigation + multi-agent review |
-| **Tokens** | `RTK.md` | 5 règles agent pour maximiser le hit-rate du hook RTK |
+| **Tokens (entrée)** | `RTK.md` | 5 règles agent pour maximiser le hit-rate du hook RTK |
+| **Tokens (sortie)** | plugin `caveman` | Réponses ultra-compressées, actif sur toutes les sessions |
 | **Mémoire** | `projects/*/memory/*.md` | Apprentissages auto-générés par projet (local uniquement, pas sync) |
 
 ### Le mindset (`CLAUDE.md`)
@@ -97,6 +101,45 @@ expliquent comment ne PAS saboter le hook :
 | 4 | Lire `rtk gain` (pas `rtk discover`) pour les vrais chiffres | confiance dans la mesure |
 | 5 | PowerShell ad-hoc → fichier `.ps1` si pipe ou >60 chars | 164 inline `-Command` évités sur 7 jours |
 
+### Le mode caveman (plugin)
+
+[Caveman](https://github.com/JuliusBrussee/caveman) attaque l'autre bout du
+problème : `rtk` réduit ce que Claude **lit**, caveman réduit ce qu'il
+**écrit**. Le plugin injecte à chaque `SessionStart` un jeu de règles de style
+qui supprime le remplissage (préambules, reformulations, récapitulatifs) sans
+toucher au code, aux commandes ni aux messages d'erreur. Annoncé à -65% de
+tokens de sortie face à une baseline non promptée.
+
+Installation en une commande, scope Claude Code uniquement :
+
+```bash
+npx -y "github:JuliusBrussee/caveman#v2.4.0" --only claude
+```
+
+| Réglage | Où | Valeur ici |
+|---|---|---|
+| Plugin | `settings.json` → `enabledPlugins` | `caveman@caveman` |
+| Marketplace | `settings.json` → `extraKnownMarketplaces` | `JuliusBrussee/caveman` |
+| Badge de statut | `settings.json` → `statusLine` | `hooks/caveman-statusline.ps1` |
+| Mode par défaut | `%APPDATA%\caveman\config.json` | `full` |
+
+Le mode se change à la volée avec `/caveman lite|full|ultra` ou `/caveman off`,
+et il est propre à la session : le défaut machine ci-dessus reprend la main au
+démarrage suivant. Un défaut par dépôt se pose dans un `.caveman.json` à la
+racine du projet, une variable `CAVEMAN_DEFAULT_MODE` passe devant tout le reste.
+
+Trois points vérifiés avant d'activer, parce qu'ils auraient été bloquants :
+
+1. **La langue est préservée.** Le skill compresse le style, pas la langue :
+   une session en français reste en français.
+2. **Rien n'est compressé hors du chat.** Commits, docs, issues, fichiers de
+   mémoire et messages destinés à d'autres humains restent en prose normale.
+3. **Aucune collision avec RTK.** Caveman se branche sur `SessionStart` et
+   `UserPromptSubmit`, RTK sur `PreToolUse`. Le manifeste du plugin câble déjà
+   ses deux hooks : l'installeur propose en plus un câblage « standalone » dans
+   `settings.json`, qu'il faut retirer sous peine de voir chaque hook tirer
+   deux fois (upstream #392).
+
 ### La mémoire (`projects/*/memory/`)
 
 Claude écrit des fichiers `feedback_*.md`, `reference_*.md`,
@@ -123,8 +166,8 @@ git clone https://github.com/thibault-monteiro/claude-config.git "$HOME/.claude"
 # 3. Restaure les credentials (jamais commités — propres à chaque poste)
 cp "$HOME/.claude.backup/.credentials.json" "$HOME/.claude/"
 
-# 4. (optionnel) Plugins déjà installés
-cp -r "$HOME/.claude.backup/plugins" "$HOME/.claude/"
+# 4. Réinstalle caveman (settings.json le déclare, le cache du plugin est local)
+npx -y "github:JuliusBrussee/caveman#v2.4.0" --only claude
 ```
 
 Alias pratique à ajouter dans `~/.bashrc` :
@@ -153,9 +196,11 @@ Idempotent — relancer ne fait rien si tout est à jour.
 ~/.claude/
 ├── CLAUDE.md           # mindset + investigation + multi-agent review
 ├── RTK.md              # 5 règles agent token-optim
-├── settings.json       # permissions allow/deny + hook PreToolUse rtk
+├── settings.json       # permissions + hook rtk + plugin caveman + statusLine
 ├── README.md           # ce fichier
 ├── sync.sh             # script de sync pull/commit/push
+├── hooks/              # ⛔ local (posé par l'installeur caveman, statusline)
+├── plugins/            # ⛔ local (cache du marketplace caveman)
 ├── .credentials.json   # ⛔ jamais commité (par poste)
 └── projects/             # ⛔ local uniquement (infos internes)
     └── <projet>/
@@ -174,7 +219,7 @@ Idempotent — relancer ne fait rien si tout est à jour.
 | `projects/` (tout le dossier) | Mémoires projet — contiennent des infos internes (noms, URLs, codebase) |
 | `projects/*/[uuid].jsonl` | Transcripts volumineux + propres au poste |
 | `todos/`, `tasks/` | State de session |
-| `plugins/` | Réinstallables — restaurables depuis le backup au setup, pas synchro |
+| `plugins/`, `hooks/` | Réinstallables : `settings.json` déclare le plugin caveman, une commande le repose |
 
 <a id="adapter-à-ton-workflow"></a>
 
@@ -186,6 +231,9 @@ librement et tord-le à ton workflow :
 - **Tu n'utilises pas RTK ?** Vire `@RTK.md` en ligne 1 de `CLAUDE.md`
   + supprime `RTK.md` + retire le hook de `settings.json`. Les 4
   principes mindset tiennent debout sans.
+- **Tu ne veux pas du style caveman ?** `/caveman off` coupe pour une
+  session, `defaultMode: "off"` dans `%APPDATA%\caveman\config.json` coupe
+  partout, `npx -y github:JuliusBrussee/caveman -- --uninstall` désinstalle.
 - **Tu codes sur Linux/Mac ?** La règle 5 de RTK (PowerShell) ne te
   concerne pas, tout le reste s'applique.
 - **Tu n'as qu'un poste ?** Pas besoin de `sync.sh` ni de remote — ça
